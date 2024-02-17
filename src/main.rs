@@ -1,34 +1,36 @@
-use std::io::{self, BufRead};
+use std::io;
 use std::fs;
-use std::path;
 fn main() {
-    let file_path = path::Path::new("/Users/gabriel/code/rust/text-finder-tool/test-data/text.txt");
+    let file_path = "/Users/gabriel/code/rust/text-finder-tool/test-data/text.txt";
+    let buffer = match fs::read_to_string(file_path){
+        Ok(content) => {
+            println!("Loaded file into buffer");
+            content
+        },
+        Err(_) => {
+            println!("Failed to load file into buffer");
+            String::new()
+        }
+    };
 
     loop {
-        // Take file path and open file if valid
-        let file = match fs::File::open(&file_path) {
-            Ok(file) => file,
-            Err(e) => {
-                println!("Invalid file or file path.");
-                continue;
-            }
-        };
-        let reader = io::BufReader::new(file);
-
-        // take string to find and search
         println!("Enter the text you want to find: ");
         let mut text_to_find: String = String::new();
 
         match io::stdin().read_line(&mut text_to_find){
-            Ok(_) => println!("{}", text_to_find),
-            Err(_) => continue,
-        }
-
-        for line in reader.lines() {
-            match line {
-                Ok(line) => println!("{}", line),
-                Err(e) => eprintln!("Failed to read line: {}", e),
+            Ok(_) => println!("Finding {}", text_to_find),
+            Err(_) => {
+                print!("Failed to start finding {}", text_to_find);
+                continue;
             }
         }
+
+        if buffer.contains(&text_to_find) {
+            println!("Found!");
+        } else {
+            println!("Not found!");
+        }
+
+        break;
     }
 }
